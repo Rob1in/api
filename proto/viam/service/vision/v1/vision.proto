@@ -3,6 +3,7 @@ syntax = "proto3";
 package viam.service.vision.v1;
 
 import "common/v1/common.proto";
+import "component/camera/v1/camera.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 
@@ -45,6 +46,12 @@ service VisionService {
   rpc GetObjectPointClouds(GetObjectPointCloudsRequest) returns (GetObjectPointCloudsResponse) {
     option (google.api.http) = {
       post: "/viam/api/v1/service/vision/{name}/object_point_clouds"
+    };
+  }
+
+  rpc CaptureAllFromCamera(CaptureAllFromCameraRequest) returns (CaptureAllFromCameraResponse) {
+    option (google.api.http) = {
+      post: "/viam/api/v1/service/vision/{name}/capture_all"
     };
   }
 
@@ -159,4 +166,26 @@ message GetObjectPointCloudsResponse {
   string mime_type = 1;
   // List of objects in the scene
   repeated common.v1.PointCloudObject objects = 2;
+}
+
+message CaptureAllFromCameraRequest {
+  // name of the vision service
+  string name = 1;
+  // name of camera source to use as input
+  string camera_name = 2;
+  // flags to enable for the response
+  bool return_image = 3;
+  bool return_classifications = 4;
+  bool return_detections = 5;
+  bool return_object_point_clouds = 6;
+
+  google.protobuf.Struct extra = 99;
+}
+
+message CaptureAllFromCameraResponse {
+  component.camera.v1.Image image = 1;
+  repeated Detection detections = 2;
+  repeated Classification classifications = 3;
+  repeated common.v1.PointCloudObject objects = 4;
+  google.protobuf.Struct extra = 99;
 }
